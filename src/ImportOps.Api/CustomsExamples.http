@@ -1,0 +1,107 @@
+@baseUrl = https://localhost:5001
+@token = REPLACE_WITH_JWT
+@operationId = 1
+@shipmentId = 1
+@customsId = 1
+@observationId = 1
+@taxId = 1
+
+### Crear proceso aduanero
+POST {{baseUrl}}/api/customs/from-operation/{{operationId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "shipmentId": {{shipmentId}},
+  "customsRegime": "Importación para el consumo",
+  "declarationNo": "118-2026-10-123456",
+  "declarationDate": "2026-09-19",
+  "customsOffice": "Aduana Marítima del Callao",
+  "dutiesCurrencyCode": "PEN",
+  "dutiesExchangeRate": 1,
+  "observation": "Expediente inicial de nacionalización."
+}
+
+### Obtener detalle
+GET {{baseUrl}}/api/customs/{{customsId}}
+Authorization: Bearer {{token}}
+
+### Iniciar revisión
+POST {{baseUrl}}/api/customs/{{customsId}}/start-review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rowVersion": "REPLACE_ROW_VERSION",
+  "comment": "Declaración numerada y enviada a revisión."
+}
+
+### Asignar canal rojo
+POST {{baseUrl}}/api/customs/{{customsId}}/channel
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rowVersion": "REPLACE_ROW_VERSION",
+  "channel": "RED",
+  "comment": "Canal rojo asignado por autoridad."
+}
+
+### Registrar observación
+POST {{baseUrl}}/api/customs/{{customsId}}/observations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "observationType": "INSPECTION",
+  "severity": "HIGH",
+  "description": "Autoridad solicita reconocimiento físico y contraste de series."
+}
+
+### Resolver observación
+POST {{baseUrl}}/api/customs/{{customsId}}/observations/{{observationId}}/resolve
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rowVersion": "REPLACE_OBSERVATION_ROW_VERSION",
+  "resolutionNote": "Reconocimiento físico concluido sin diferencias."
+}
+
+### Registrar IGV
+POST {{baseUrl}}/api/customs/{{customsId}}/taxes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "taxType": "IGV",
+  "description": "IGV de importación",
+  "amount": 18500.40,
+  "currencyCode": "PEN",
+  "exchangeRate": 1,
+  "notes": "Liquidación aduanera."
+}
+
+### Marcar tributo pagado
+POST {{baseUrl}}/api/customs/{{customsId}}/taxes/{{taxId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rowVersion": "REPLACE_TAX_ROW_VERSION",
+  "paymentStatus": "PAID",
+  "paymentReference": "NPS-2026-0099812",
+  "paidAt": "2026-09-20T14:10:00Z",
+  "comment": "Pago confirmado."
+}
+
+### Registrar levante
+POST {{baseUrl}}/api/customs/{{customsId}}/release
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rowVersion": "REPLACE_PROCESS_ROW_VERSION",
+  "releaseDate": "2026-09-21T16:30:00Z",
+  "comment": "Levante autorizado por SUNAT."
+}

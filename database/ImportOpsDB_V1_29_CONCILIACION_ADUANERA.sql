@@ -1,0 +1,13 @@
+/* Ejecutar después de V1_28 en QA. Sin reclasificar pagos históricos. */
+SET XACT_ABORT ON;
+GO
+IF OBJECT_ID(N'fin.CUSTOMS_TAX_PAYMENT',N'U') IS NULL
+ THROW 51001, 'Primero ejecutar ImportOpsDB_V1_28_ADUANAS_PEN.sql', 1;
+GO
+IF COL_LENGTH('fin.CUSTOMS_TAX_PAYMENT','funding_source') IS NULL
+ ALTER TABLE fin.CUSTOMS_TAX_PAYMENT ADD funding_source varchar(20) NOT NULL CONSTRAINT DF_CUSTOMS_TAX_PAYMENT_FUNDING DEFAULT('UNASSIGNED');
+GO
+IF NOT EXISTS(SELECT 1 FROM sys.check_constraints WHERE parent_object_id=OBJECT_ID(N'fin.CUSTOMS_TAX_PAYMENT') AND name=N'CK_CUSTOMS_TAX_PAYMENT_FUNDING')
+ ALTER TABLE fin.CUSTOMS_TAX_PAYMENT ADD CONSTRAINT CK_CUSTOMS_TAX_PAYMENT_FUNDING CHECK(funding_source IN ('UNASSIGNED','CLIENT_ADVANCE','COMPANY_FUNDS','CLIENT_DIRECT'));
+GO
+/* UNASSIGNED requiere revisión manual; nunca se atribuye automáticamente a anticipos. */

@@ -1,0 +1,75 @@
+@host = http://localhost:5090
+@companyId = 1
+@userId = 1
+
+### Health
+GET {{host}}/health
+
+### Usuarios activos
+GET {{host}}/api/catalogs/users
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+### Listar solicitudes
+GET {{host}}/api/import-requests?page=1&pageSize=20
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+### Crear solicitud
+POST {{host}}/api/import-requests
+Content-Type: application/json
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+{
+  "clientId": 1,
+  "clientContactId": null,
+  "supplierId": null,
+  "assignedUserId": 1,
+  "requestDate": "2026-08-17",
+  "transportModeId": 1,
+  "incotermCode": "FOB",
+  "originCountryCode": "CN",
+  "destinationCountryCode": "PE",
+  "originPortId": null,
+  "destinationPortId": null,
+  "merchandiseDescription": "Mercancía de prueba para importación",
+  "packageCount": 10,
+  "grossWeightKg": 250.5,
+  "volumeM3": 3.25,
+  "declaredValue": 15000,
+  "declaredCurrencyCode": "USD",
+  "desiredServiceDate": "2026-09-15",
+  "customerNotes": "Solicitud inicial del cliente",
+  "internalNotes": "Validar documentación comercial"
+}
+
+### Enviar a revisión
+POST {{host}}/api/import-requests/1/submit-review
+Content-Type: application/json
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+{
+  "comment": "Información inicial revisada."
+}
+
+### Observar
+POST {{host}}/api/import-requests/1/observe
+Content-Type: application/json
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+{
+  "comment": "Falta confirmar peso bruto."
+}
+
+### Rechazar
+POST {{host}}/api/import-requests/1/reject
+Content-Type: application/json
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+{
+  "comment": "La operación no puede ser atendida bajo las condiciones solicitadas."
+}

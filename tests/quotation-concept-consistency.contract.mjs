@@ -1,0 +1,12 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const svc=fs.readFileSync('src/ImportOps.Infrastructure/Services/CatalogAdministrationService.cs','utf8');
+const quote=fs.readFileSync('src/ImportOps.Infrastructure/Services/QuotationService.cs','utf8');
+assert.match(svc,/QUOTATION-CONCEPTS/);
+assert.match(svc,/ValidateQuotationConceptAsync/);
+assert.match(svc,/exactamente una categoría/);
+assert.match(svc,/Ítems de cotización/);
+assert.match(quote,/serviceCategoryId = concept\.ServiceCategoryId/);
+assert.match(quote,/expenseCategoryId = concept\.ExpenseCategoryId/);
+assert.match(quote,/itemType = serviceCategoryId\.HasValue \? QuotationItemTypes\.Service : QuotationItemTypes\.EstimatedCost/);
+assert.doesNotMatch(quote,/Las categorías del ítem deben corresponder al concepto configurado/);
+console.log('quotation concept consistency backend contract PASS');

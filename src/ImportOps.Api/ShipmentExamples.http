@@ -1,0 +1,75 @@
+@baseUrl = https://localhost:5001
+@token = REPLACE_WITH_JWT
+@operationId = 1
+@shipmentId = 1
+@containerId = 1
+
+### Crear embarque desde operación
+POST {{baseUrl}}/api/shipments/from-operation/{{operationId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "carrierName": "Maersk",
+  "vesselFlightName": "MAERSK EXAMPLE",
+  "bookingNo": "BK-2026-00125",
+  "masterDocumentNo": "MBL123456789",
+  "originPortId": 10,
+  "destinationPortId": 1,
+  "etd": "2026-08-25T08:00:00Z",
+  "eta": "2026-09-18T12:00:00Z",
+  "notes": "Embarque marítimo principal."
+}
+
+### Agregar contenedor
+POST {{baseUrl}}/api/shipments/{{shipmentId}}/containers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "containerNo": "MSCU1234567",
+  "containerType": "40HC",
+  "sealNo": "SL99887",
+  "packageCount": 120,
+  "grossWeightKg": 18350.500,
+  "volumeM3": 57.8000,
+  "isActive": true
+}
+
+### Confirmar booking
+POST {{baseUrl}}/api/shipments/{{shipmentId}}/book
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "comment": "Booking confirmado por naviera."
+}
+
+### Confirmar salida
+POST {{baseUrl}}/api/shipments/{{shipmentId}}/depart
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "eventAt": "2026-08-25T09:10:00Z",
+  "comment": "Nave zarpó según confirmación del carrier."
+}
+
+### Marcar en tránsito
+POST {{baseUrl}}/api/shipments/{{shipmentId}}/in-transit
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "comment": "Tracking confirmado en tránsito."
+}
+
+### Confirmar arribo
+POST {{baseUrl}}/api/shipments/{{shipmentId}}/arrive
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "eventAt": "2026-09-18T13:20:00Z",
+  "comment": "Arribo confirmado en puerto destino."
+}

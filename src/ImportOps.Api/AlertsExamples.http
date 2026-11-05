@@ -1,0 +1,28 @@
+@host = http://localhost:5090
+
+### Resumen de alertas visibles para la sesión actual
+GET {{host}}/api/alerts/summary
+
+### Contador no leído
+GET {{host}}/api/alerts/unread-count
+
+### Alertas activas
+GET {{host}}/api/alerts?status=ACTIVE&page=1&pageSize=20
+
+### Solo críticas
+GET {{host}}/api/alerts?status=ACTIVE&severity=CRITICAL&page=1&pageSize=20
+
+### Solo no leídas
+GET {{host}}/api/alerts?status=ACTIVE&isRead=false&page=1&pageSize=20
+
+### Marcar una alerta como leída
+POST {{host}}/api/alerts/1/read
+
+### Marcar todas las alertas visibles como leídas
+POST {{host}}/api/alerts/read-all
+
+### Ocultar una alerta para el usuario actual
+POST {{host}}/api/alerts/1/dismiss
+
+### Forzar reconciliación - requiere ALERTS.MANAGE
+POST {{host}}/api/alerts/refresh

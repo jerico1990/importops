@@ -1,0 +1,105 @@
+@baseUrl = http://localhost:5090
+@companyId = 1
+@userId = 1
+@requestId = 1
+@quotationId = 1
+@itemId = 1
+
+### Crear primera cotización
+POST {{baseUrl}}/api/quotations/from-request/{{requestId}}
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "currencyCode": "USD",
+  "issueDate": "2026-08-17",
+  "validUntil": "2026-08-31",
+  "terms": "Vigencia de 14 días. Valores sujetos a variación por terceros.",
+  "internalNotes": "Primera propuesta comercial.",
+  "items": [
+    {
+      "itemType": "SERVICE",
+      "description": "Gestión integral de importación",
+      "quantity": 1,
+      "unitPrice": 500,
+      "discountAmount": 0,
+      "taxRate": 18,
+      "serviceCategoryId": 1,
+      "isRebillable": false
+    },
+    {
+      "itemType": "ESTIMATED_COST",
+      "description": "Flete internacional estimado",
+      "quantity": 1,
+      "unitPrice": 1400,
+      "discountAmount": 0,
+      "taxRate": 0,
+      "expenseCategoryId": 1,
+      "isRebillable": true
+    }
+  ]
+}
+
+### Obtener detalle
+GET {{baseUrl}}/api/quotations/{{quotationId}}
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+### Agregar concepto
+POST {{baseUrl}}/api/quotations/{{quotationId}}/items
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "itemType": "OTHER",
+  "description": "Gasto administrativo",
+  "quantity": 1,
+  "unitPrice": 50,
+  "discountAmount": 0,
+  "taxRate": 18,
+  "isRebillable": false
+}
+
+### Enviar al cliente
+POST {{baseUrl}}/api/quotations/{{quotationId}}/send
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "comment": "Cotización enviada al cliente."
+}
+
+### Rechazar
+POST {{baseUrl}}/api/quotations/{{quotationId}}/reject
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "reason": "Cliente solicita ajustar flete y honorarios."
+}
+
+### Crear nueva versión
+POST {{baseUrl}}/api/quotations/{{quotationId}}/new-version
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "validUntil": "2026-09-05",
+  "comment": "Nueva versión por observaciones del cliente."
+}
+
+### Aprobar
+POST {{baseUrl}}/api/quotations/{{quotationId}}/approve
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "approvedByName": "Juan Pérez - Importaciones ABC SAC",
+  "comment": "Cliente confirma aceptación comercial."
+}

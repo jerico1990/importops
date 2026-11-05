@@ -1,0 +1,87 @@
+@baseUrl = http://localhost:5090
+@companyId = 1
+@userId = 1
+@quotationId = 1
+@operationId = 1
+@taskId = 1
+
+### Crear operación desde cotización APPROVED
+POST {{baseUrl}}/api/operations/from-quotation/{{quotationId}}
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "responsibleUserId": 1,
+  "estimatedCloseDate": "2026-10-15",
+  "notes": "Operación abierta desde cotización aprobada."
+}
+
+### Consultar operación
+GET {{baseUrl}}/api/operations/{{operationId}}
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+### Listar tareas
+GET {{baseUrl}}/api/operations/{{operationId}}/tasks
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+
+### Completar tarea
+POST {{baseUrl}}/api/operations/{{operationId}}/tasks/{{taskId}}/status
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "status": "COMPLETED",
+  "comment": "Documento revisado y conforme."
+}
+
+### Cambiar de etapa (solo si tareas obligatorias y prerequisitos están OK)
+POST {{baseUrl}}/api/operations/{{operationId}}/change-stage
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "toStageId": 2,
+  "comment": "Documentación inicial validada."
+}
+
+### Pausar
+POST {{baseUrl}}/api/operations/{{operationId}}/hold
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "comment": "A la espera de confirmación del proveedor."
+}
+
+### Reanudar
+POST {{baseUrl}}/api/operations/{{operationId}}/resume
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "comment": "Proveedor confirmó información pendiente."
+}
+
+### Registrar incidencia
+POST {{baseUrl}}/api/operations/{{operationId}}/notes
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
+Content-Type: application/json
+
+{
+  "noteType": "INCIDENT",
+  "noteText": "Proveedor informó retraso de 48 horas en la salida.",
+  "isPinned": true
+}
+
+### Timeline
+GET {{baseUrl}}/api/operations/{{operationId}}/events
+X-Company-Id: {{companyId}}
+X-User-Id: {{userId}}
