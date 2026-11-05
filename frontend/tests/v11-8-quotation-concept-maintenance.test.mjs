@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const root=process.cwd();
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+const types=read('src/features/configuration/types.ts');
+const page=read('src/pages/configuration/CatalogsPage.tsx');
+const form=read('src/features/configuration/CatalogFormDialog.tsx');
+const item=read('src/features/quotations/QuotationItemDialog.tsx');
+assert.match(types,/"quotation-concepts"/,'quotation-concepts must be an administered catalog');
+assert.match(page,/Conceptos de proforma/,'catalog page must expose quotation concepts');
+assert.match(form,/serviceCategoryId/,'maintenance must configure service category');
+assert.match(form,/expenseCategoryId/,'maintenance must configure expense category');
+assert.match(form,/defaultTaxRate/,'maintenance must configure default tax rate');
+assert.match(item,/Configuración del concepto/,'item modal must show concept-derived configuration');
+assert.match(item,/concept\.serviceCategoryId[\s\S]*setItemType/,'selecting a concept must derive item type');
+console.log('v11.8 quotation concept maintenance contract PASS');

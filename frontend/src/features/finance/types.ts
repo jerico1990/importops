@@ -1,0 +1,11 @@
+export type FinancialSummary = {
+  operationId:number; financialStatus:string; totalClientFunds:number; totalExpenses:number; totalExpensePayments:number;
+  totalServices:number; totalCollections:number; totalRefunds:number; managedFundBalance:number; pendingServiceCollection:number; clientBalance:number;
+};
+export type Budget={operationBudgetId:number;versionNo:number;status:string;baseCurrencyCode:string;estimatedCost:number;estimatedService:number;total:number;rowVersion:string};
+export type Fund={clientFundId:number;status:string;requestedAmount?:number|null;receivedAmount?:number|null;currencyCode:string;baseAmount?:number|null;referenceNo?:string|null;rowVersion:string;exchangeRate?:number|null;paymentMethodId?:number|null;notes?:string|null};
+export type Expense={operationExpenseId:number;status:string;description:string;amount:number;currencyCode:string;baseAmount:number;isRebillable:boolean;payerType?:"COMPANY"|"CLIENT";paidBaseAmount:number;rowVersion:string;expenseCategoryId:number;supplierId?:number|null;documentReference?:string|null;expenseDate?:string|null;dueDate?:string|null;exchangeRate?:number|null;rebillAmount?:number|null;notes?:string|null};
+export type Service={operationServiceId:number;status:string;description:string;amount:number;currencyCode:string;baseAmount:number;collectedAmount:number;rowVersion:string;serviceCategoryId?:number;exchangeRate?:number|null;notes?:string|null};
+export type Collection={clientCollectionId:number;type:string;status:string;amount:number;currencyCode:string;baseAmount:number;referenceNo?:string|null;rowVersion:string;collectionDate?:string|null;exchangeRate?:number|null;paymentMethodId?:number|null;notes?:string|null};
+export type Refund={clientRefundId:number;status:string;amount:number;currencyCode:string;baseAmount:number;referenceNo?:string|null;rowVersion:string;exchangeRate?:number|null;paymentMethodId?:number|null;reason?:string|null;notes?:string|null};
+export type Settlement={operationSettlementId:number;status:string;baseCurrencyCode:string;totalClientFunds:number;totalExpenses:number;totalCompanyServices:number;totalCollections:number;totalRefunds:number;totalAdjustments:number;clientBalance:number;rowVersion:string};

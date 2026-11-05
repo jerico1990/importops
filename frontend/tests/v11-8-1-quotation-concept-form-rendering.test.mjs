@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+const form=fs.readFileSync('src/features/configuration/CatalogFormDialog.tsx','utf8');
+const marker='catalog === "quotation-concepts" && (';
+assert.match(form,new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')),'quotation concept maintenance section must render independently');
+assert.doesNotMatch(form,/\{catalog === \"quotation-concepts\" && <>/,'quotation concept controls must not use the broken nested fragment');
+assert.match(form,/Tipo \*/,'must render type');
+assert.match(form,/Categoría de servicio \*/,'must render service category');
+assert.match(form,/Categoría de gasto \*/,'must render expense category');
+assert.match(form,/Grupo \*/,'must render group');
+assert.match(form,/Afecto a impuesto/,'must render tax treatment');
+assert.match(form,/Impuesto \(%\)/,'must render tax rate');
+assert.match(form,/rendición \/ refacturación/,'must render rebillable option');
+console.log('v11.8.1 quotation concept form rendering contract PASS');

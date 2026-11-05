@@ -1,0 +1,8 @@
+V11.18 - Correcciones parciales verificables
+- Cuatro pestañas ordenadas: Gastos y servicios, Anticipos y pagos, Financiamiento y cobranza, Liquidación final.
+- El documento de liquidación solo aparece en la última pestaña.
+- El plazo se configura antes de emitir; el registro de envío sigue habilitado solo después de emitir.
+- Tras alta, edición o anulación exitosa se refrescan datos y la vista previa de la liquidación mediante revision.
+- Los gastos con pagos vinculados continúan bloqueados para edición/anulación de importes: el backend V10.24 NO ofrece endpoints de consulta/reversión de pagos de gastos; no se debe simular la capacidad.
+- No se han modificado reglas de backend ni tablas.
+- No compilado: el ZIP original no contiene package-lock.json ni node_modules y npm ci no puede ejecutarse.
