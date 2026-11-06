@@ -1,4 +1,3 @@
-using System.Data;
 using ImportOps.Application.Common;
 using ImportOps.Application.ImportRequests;
 using ImportOps.Domain.Entities;
@@ -680,23 +679,7 @@ public sealed class ImportRequestService(
             (!currentUser.IsClientUser || x.ClientId == currentUser.ClientId), ct);
 
     private async Task<long> NextRequestSequenceAsync(CancellationToken ct)
-    {
-        var connection = db.Database.GetDbConnection();
-        var shouldClose = connection.State != ConnectionState.Open;
-        if (shouldClose) await connection.OpenAsync(ct);
-
-        try
-        {
-            await using var command = connection.CreateCommand();
-            command.CommandText = "SELECT NEXT VALUE FOR sales.SEQ_REQUEST_NO;";
-            var value = await command.ExecuteScalarAsync(ct);
-            return Convert.ToInt64(value);
-        }
-        finally
-        {
-            if (shouldClose) await connection.CloseAsync();
-        }
-    }
+        => await MariaDbSequence.NextAsync(db, "REQUEST_NO", ct);
 
     private static string NormalizeStatus(string value)
     {

@@ -1,5 +1,6 @@
 using ImportOps.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace ImportOps.Infrastructure.Persistence;
 
@@ -104,6 +105,28 @@ public sealed class ImportOpsDbContext(DbContextOptions<ImportOpsDbContext> opti
             e.Property(x=>x.RowVer).HasColumnName("row_ver").IsRowVersion();
         });
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ImportOpsDbContext).Assembly);
+
+        // SQL Server schemas are flattened into table prefixes in the MariaDB dump,
+        // for example sales.QUOTATION becomes sales__QUOTATION.
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var tableName = entityType.GetTableName();
+            var schema = entityType.GetSchema();
+            if (tableName is not null && schema is not null)
+            {
+                entityType.SetTableName($"{schema}__{tableName}");
+                entityType.SetSchema(null);
+            }
+
+            // MariaDB has no SQL Server rowversion column. Keep row_ver as an
+            // application-managed optimistic concurrency token instead.
+            foreach (var rowVersion in entityType.GetProperties().Where(property => property.Name == "RowVer"))
+            {
+                rowVersion.IsConcurrencyToken = true;
+                rowVersion.ValueGenerated = ValueGenerated.Never;
+            }
+        }
+
         base.OnModelCreating(modelBuilder);
     }
 }

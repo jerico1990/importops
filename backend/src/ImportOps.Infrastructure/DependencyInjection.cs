@@ -31,7 +31,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ImportOpsDbContext>((sp, options) =>
             options
-                .UseSqlServer(cs)
+                .UseMySql(cs, ServerVersion.AutoDetect(cs))
                 .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
 
         services.AddScoped<IAlertService, AlertService>();

@@ -1,4 +1,3 @@
-using System.Data;
 using ImportOps.Application.Common;
 using ImportOps.Application.Operations;
 using ImportOps.Domain.Entities;
@@ -1567,23 +1566,7 @@ public sealed class ImportOperationService(
     }
 
     private async Task<long> NextOperationSequenceAsync(CancellationToken ct)
-    {
-        var connection = db.Database.GetDbConnection();
-        var shouldClose = connection.State != ConnectionState.Open;
-        if (shouldClose) await connection.OpenAsync(ct);
-
-        try
-        {
-            await using var command = connection.CreateCommand();
-            command.CommandText = "SELECT NEXT VALUE FOR ops.SEQ_OPERATION_NO;";
-            var value = await command.ExecuteScalarAsync(ct);
-            return Convert.ToInt64(value);
-        }
-        finally
-        {
-            if (shouldClose) await connection.CloseAsync();
-        }
-    }
+        => await MariaDbSequence.NextAsync(db, "OPERATION_NO", ct);
 
     private static void EnsureEditable(ImportOperation operation)
     {

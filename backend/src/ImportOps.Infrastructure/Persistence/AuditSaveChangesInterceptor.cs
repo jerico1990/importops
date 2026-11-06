@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Buffers.Binary;
 using ImportOps.Application.Common;
 using ImportOps.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,8 @@ public sealed class AuditSaveChangesInterceptor(
 
         foreach (var entry in entries)
         {
+            AdvanceRowVersion(entry);
+
             var oldValues = entry.State == EntityState.Added ? null : Values(entry, original: true);
             var newValues = entry.State == EntityState.Deleted
                 ? null
@@ -88,6 +91,30 @@ public sealed class AuditSaveChangesInterceptor(
                 CorrelationId = requestMetadata.CorrelationId
             });
         }
+    }
+
+    private static void AdvanceRowVersion(EntityEntry entry)
+    {
+        var rowVersion = entry.Properties.FirstOrDefault(property => property.Metadata.Name == "RowVer");
+        if (rowVersion is null)
+            return;
+
+        if (entry.State == EntityState.Added)
+        {
+            rowVersion.CurrentValue = new byte[sizeof(ulong)];
+            return;
+        }
+
+        var original = rowVersion.OriginalValue as byte[] ?? Array.Empty<byte>();
+        Span<byte> current = stackalloc byte[sizeof(ulong)];
+        var currentValue = original.AsSpan(Math.Max(0, original.Length - current.Length));
+        currentValue.CopyTo(current[(current.Length - currentValue.Length)..]);
+
+        var next = BinaryPrimitives.ReadUInt64BigEndian(current) + 1;
+        var nextBytes = new byte[sizeof(ulong)];
+        BinaryPrimitives.WriteUInt64BigEndian(nextBytes, next);
+        rowVersion.CurrentValue = nextBytes;
+        rowVersion.IsModified = true;
     }
 
     private static Dictionary<string, object?> Values(EntityEntry entry, bool original)

@@ -102,7 +102,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<ImportOpsDbContext>(
-        "sql-server",
+        "mariadb",
         tags: new[] { "ready" });
 
 var app = builder.Build();

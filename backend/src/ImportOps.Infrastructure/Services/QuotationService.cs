@@ -1,4 +1,3 @@
-using System.Data;
 using ImportOps.Application.Common;
 using ImportOps.Application.ImportRequests;
 using ImportOps.Application.Quotations;
@@ -955,23 +954,7 @@ public sealed class QuotationService(
     }
 
     private async Task<long> NextQuotationSequenceAsync(CancellationToken ct)
-    {
-        var connection = db.Database.GetDbConnection();
-        var shouldClose = connection.State != ConnectionState.Open;
-        if (shouldClose) await connection.OpenAsync(ct);
-
-        try
-        {
-            await using var command = connection.CreateCommand();
-            command.CommandText = "SELECT NEXT VALUE FOR sales.SEQ_QUOTATION_NO;";
-            var value = await command.ExecuteScalarAsync(ct);
-            return Convert.ToInt64(value);
-        }
-        finally
-        {
-            if (shouldClose) await connection.CloseAsync();
-        }
-    }
+        => await MariaDbSequence.NextAsync(db, "QUOTATION_NO", ct);
 
     private static void EnsureDraft(Quotation entity)
     {

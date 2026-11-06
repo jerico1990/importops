@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ImportOpsDB
+      MARIADB_USER: importops
+      MARIADB_PASSWORD: ${DB_PASSWORD:-importops_local}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-root_local_only}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./bd/ImportOpsDB_MariaDB_COMPLETO.sql:/docker-entrypoint-initdb.d/001-importops.sql:ro
+      - ./backend/database/mariadb/002_app_sequences.sql:/docker-entrypoint-initdb.d/002-app-sequences.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__ImportOpsDb: "Server=db;Port=3306;Database=ImportOpsDB;User=importops;Password=${DB_PASSWORD:-importops_local};CharSet=utf8mb4"
+      Cors__AllowedOrigins__0: http://localhost:5173
+      Storage__LocalRoot: /app/storage
+    ports:
+      - "5090:8080"
+    volumes:
+      - importops_uploads:/app/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8080
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+
+volumes:
+  mariadb_data:
+  importops_uploads:
