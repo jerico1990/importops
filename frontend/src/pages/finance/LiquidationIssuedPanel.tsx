@@ -83,7 +83,6 @@ export function LiquidationIssuedPanel({operationId,canApprove,view="document",r
     <div className="ml-auto max-w-lg space-y-2 text-sm">{([['Gastos de terceros',section.totalExpenses],['Servicios R&B',section.totalServices],...(section.currencyCode==='PEN'?[['Tributos aduaneros',section.totalCustomsTaxes] as const]:[]),['Total liquidado',section.totalDue],['Anticipos recibidos',section.clientAdvances],['Cobros por servicios',section.serviceCollections],['Desembolsos directos del importador',section.directClientTaxPayments],['Devoluciones',section.totalRefunded]] as readonly (readonly [string,number])[]).map(([label,value])=><div className="flex justify-between gap-3" key={label}><span>{label}</span><b className="tabular-nums">{fmt(value)}</b></div>)}<div className="flex justify-between border-t pt-3 font-bold"><span>{section.balance>0?'Saldo a favor del cliente':section.balance<0?'Saldo por cobrar':'Saldo conciliado'}</span><span>{fmt(Math.abs(section.balance))}</span></div></div>
    </section>;
   })}
-  {view==="financing"&&financingSection}
   <ActionDialog request={actionRequest} onClose={()=>setActionRequest(null)}/>
   <p className="text-xs text-slate-500">La emisión congela los importes del documento. No aprueba ni cierra automáticamente la rendición financiera.</p>
  </div>;

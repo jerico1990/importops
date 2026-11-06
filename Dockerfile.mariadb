@@ -1,0 +1,6 @@
+FROM mariadb:11.4
+
+COPY bd/ImportOpsDB_MariaDB_COMPLETO.sql /docker-entrypoint-initdb.d/001-importops.sql
+COPY backend/database/mariadb/002_app_sequences.sql /docker-entrypoint-initdb.d/002-app-sequences.sql
+
+EXPOSE 3306
