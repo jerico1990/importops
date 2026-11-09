@@ -48,7 +48,13 @@ public static class DependencyInjection
         services.AddScoped<ISecurityService, SecurityService>();
         services.AddScoped<IShipmentService, ShipmentService>();
         services.AddScoped<ICustomsService, CustomsService>();
-        services.AddSingleton<IFileStorage, LocalFileStorage>();
+        services.AddSingleton<LocalFileStorage>();
+        if (string.Equals(configuration["Storage:Provider"], "FTPS", StringComparison.OrdinalIgnoreCase))
+            services.AddSingleton<FtpsFileStorage>();
+        services.AddSingleton<IFileStorage>(sp => new RoutedFileStorage(
+            configuration, sp.GetRequiredService<LocalFileStorage>(),
+            string.Equals(configuration["Storage:Provider"], "FTPS", StringComparison.OrdinalIgnoreCase)
+                ? sp.GetRequiredService<FtpsFileStorage>() : null));
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IFinanceService, FinanceService>();
         services.AddScoped<ILiquidationService, LiquidationService>();
