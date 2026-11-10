@@ -127,7 +127,7 @@ public sealed class FtpsFileStorage(IConfiguration configuration) : IFileStorage
                 FtpRemoteExists.Overwrite,
                 true,
                 FtpVerify.Retry,
-                cancellationToken: ct);
+                token: ct);
 
             if (status != FtpStatus.Success)
             {
