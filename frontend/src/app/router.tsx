@@ -27,7 +27,7 @@ import { FinanceDetailPage } from "@/pages/finance/FinanceDetailPage";
 import { ClientLiquidationPage } from "@/pages/finance/ClientLiquidationPage";
 function OperationEntry(){ return <OperationDetailPage/>; }
 import { UsersPage } from "@/pages/security/UsersPage";
-import { ModulePlaceholderPage } from "@/pages/shared/ModulePlaceholderPage";
+import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { ForbiddenPage } from "@/pages/shared/ForbiddenPage";
 import { AlertsPage } from "@/pages/alerts/AlertsPage";
 import { Permissions } from "@/types/auth";
@@ -207,12 +207,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "perfil",
-            element: (
-              <ModulePlaceholderPage
-                title="Mi perfil"
-                description="Datos de la sesión y cambio de contraseña."
-              />
-            )
+            element: <ProfilePage />
           }
         ]
       }

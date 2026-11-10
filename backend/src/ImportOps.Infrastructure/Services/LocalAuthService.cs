@@ -47,6 +47,34 @@ public sealed class LocalAuthService(
         return await BuildUserAsync(user, ct);
     }
 
+    public async Task<LoginUserDto> UpdateMyProfileAsync(long userId, UpdateMyProfileRequest request, CancellationToken ct)
+    {
+        var user = await db.AppUsers.SingleOrDefaultAsync(
+            x => x.UserId == userId && x.IsActive && !x.IsDeleted, ct)
+            ?? throw new BusinessException(ErrorCodes.InvalidIdentity, "Usuario no habilitado.", 401);
+
+        var firstName = request.FirstName?.Trim() ?? string.Empty;
+        var lastName = request.LastName?.Trim() ?? string.Empty;
+        var email = request.Email?.Trim() ?? string.Empty;
+        if (firstName.Length is < 1 or > 100 || lastName.Length is < 1 or > 100 ||
+            email.Length is < 3 or > 200 ||
+            !System.Net.Mail.MailAddress.TryCreate(email, out var address) || address.Address != email)
+            throw new BusinessException("INVALID_PROFILE", "Verifica los nombres, apellidos y correo electrónico.", 400);
+
+        var emailInUse = await db.AppUsers.AnyAsync(x => x.UserId != userId &&
+            x.CompanyId == user.CompanyId && !x.IsDeleted && x.Email == email, ct);
+        if (emailInUse)
+            throw new BusinessException("EMAIL_IN_USE", "El correo electrónico ya está registrado.", 409);
+
+        user.FirstName = firstName;
+        user.LastName = lastName;
+        user.Email = email;
+        user.ModifiedAt = DateTime.UtcNow;
+        user.ModifiedBy = userId;
+        await db.SaveChangesAsync(ct);
+        return await BuildUserAsync(user, ct);
+    }
+
     public async Task ChangePasswordAsync(long userId, ChangePasswordRequest request, CancellationToken ct)
     {
         var user = await db.AppUsers

@@ -83,6 +83,11 @@ public sealed class AuthController(
         => Ok(await authService.GetUserAsync(currentUser.UserId, ct));
 
     [Authorize]
+    [HttpPut("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateMyProfileRequest request, CancellationToken ct)
+        => Ok(await authService.UpdateMyProfileAsync(currentUser.UserId, request, ct));
+
+    [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(
         [FromBody] ChangePasswordRequest request,

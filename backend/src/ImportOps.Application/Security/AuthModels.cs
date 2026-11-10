@@ -30,3 +30,10 @@ public sealed class ChangePasswordRequest
     public string CurrentPassword { get; init; } = string.Empty;
     public string NewPassword { get; init; } = string.Empty;
 }
+
+public sealed class UpdateMyProfileRequest
+{
+    public string FirstName { get; init; } = string.Empty;
+    public string LastName { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+}
