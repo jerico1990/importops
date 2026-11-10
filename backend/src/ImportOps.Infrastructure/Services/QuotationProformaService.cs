@@ -28,7 +28,7 @@ public sealed class QuotationProformaService(ImportOpsDbContext db, ICurrentComp
         var items = await db.QuotationItems.AsNoTracking().Where(x=>x.QuotationId==id).OrderBy(x=>x.DisplayOrder??x.LineNo).ThenBy(x=>x.LineNo).ToListAsync(ct);
         var concepts = await db.QuotationConcepts.AsNoTracking().Where(x=>x.CompanyId==company.CompanyId).ToDictionaryAsync(x=>x.QuotationConceptId,ct);
         var data = new CommercialProformaPdf.Data(
-            co.TradeName ?? co.LegalName, co.AddressLine, co.Phone, co.Email,
+            co.LegalName, co.AddressLine, co.Phone, co.Email,
             q.Client.LegalName, q.QuotationNo, q.IssueDate, p.ReferenceFile,
             p.ContentDescription, p.CustomsRegimeName, p.CustomsOfficeName,
             p.EstimatedArrivalDate, p.ExchangeRate, p.ExwAmount, p.FreightAmount,

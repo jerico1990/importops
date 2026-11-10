@@ -168,7 +168,7 @@ export function QuotationDetailPage() {
         description={`${quote.clientName} · Solicitud ${quote.requestNo}`}
         actions={
           <>
-            {clientMode && quote.sentAt && (
+            {(!clientMode || quote.sentAt) && (
               <Button variant="secondary" onClick={async () => {
                 try {
                   const { blob, fileName } = await quotationsApi.downloadPdf(quote.quotationId);

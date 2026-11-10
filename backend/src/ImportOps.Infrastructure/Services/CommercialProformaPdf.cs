@@ -52,8 +52,9 @@ internal static class CommercialProformaPdf
         var p = pages[0];
         const double left = 47, right = 332, far = 562;
         p.Text(left, 782, Clip(d.Company.ToUpperInvariant(), 45), 15, true);
-        p.Text(left, 761, Clip(d.Address, 55), 9);
-        p.Text(left, 749, Clip(d.Phone is null ? d.Email : $"TELEF. {d.Phone}", 60), 8);
+        p.Text(left, 764, "ImportOps", 9);
+        p.Text(left, 751, Clip(d.Address, 55), 8);
+        p.Text(left, 739, Clip(d.Phone is null ? d.Email : $"TELEF. {d.Phone}", 60), 8);
         p.Text(right, 777, $"CALLAO {d.Date:dd/MM/yyyy}", 9, true);
         p.Text(right, 763, "Señores:", 9, true);
         p.Text(right, 750, Clip(d.Client, 49), 8);
@@ -153,7 +154,7 @@ internal static class CommercialProformaPdf
         p.Rule(left, notesY - 34, left + 180);
         p.Text(left, notesY - 48, "Proforma hecha por:", 8);
         p.Text(left, notesY - 72, "NOTA:", 8, true);
-        p.Text(left, notesY - 87, "** NO GRAVADO AL IGV", 9, true);
+        p.Text(left, notesY - 87, d.ExpenseTax > 0 ? "IGV SOBRE SERVICIOS SEGUN DETALLE" : "SERVICIOS SIN IGV APLICADO", 9, true);
         if (!string.IsNullOrWhiteSpace(d.Notes)) p.Text(left, notesY - 112, Clip(d.Notes, 51), 7);
         if (!string.IsNullOrWhiteSpace(d.Terms)) p.Text(left, notesY - 125, Clip(d.Terms, 51), 7);
         return Encode(pages);
