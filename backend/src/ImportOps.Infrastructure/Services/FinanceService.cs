@@ -98,7 +98,7 @@ public sealed class FinanceService(
 
     public async Task<ExpenseDto> RegisterExpenseAsync(long operationId,RegisterExpenseRequest r,CancellationToken ct)
     {
-        await GetOperationAsync(operationId,ct);if(string.IsNullOrWhiteSpace(r.Description))throw new BusinessException(ErrorCodes.Validation,"Descripción obligatoria.",400);
+        await EnsureFinanceEditableAsync(operationId,ct);if(string.IsNullOrWhiteSpace(r.Description))throw new BusinessException(ErrorCodes.Validation,"Descripción obligatoria.",400);
         ValidateMoney(r.Amount,r.ExchangeRate);await ValidateCurrencyAsync(r.CurrencyCode,ct);
         if(r.PayerType is not ("COMPANY" or "CLIENT"))throw new BusinessException(ErrorCodes.Validation,"Responsable del desembolso inválido.",400);
         if(!await db.ExpenseCategories.AsNoTracking().AnyAsync(x=>x.ExpenseCategoryId==r.ExpenseCategoryId&&x.CompanyId==currentCompany.CompanyId&&x.IsActive,ct))throw new BusinessException(ErrorCodes.Validation,"Categoría de gasto inválida.",400);
