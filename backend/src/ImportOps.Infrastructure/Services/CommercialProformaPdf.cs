@@ -51,13 +51,15 @@ internal static class CommercialProformaPdf
         var pages = new List<Page> { new() };
         var p = pages[0];
         const double left = 47, right = 332, far = 562;
-        p.Text(left, 782, Clip(d.Company.ToUpperInvariant(), 45), 15, true);
-        p.Text(left, 764, "ImportOps", 9);
-        p.Text(left, 751, Clip(d.Address, 55), 8);
-        p.Text(left, 739, Clip(d.Phone is null ? d.Email : $"TELEF. {d.Phone}", 60), 8);
-        p.Text(right, 777, $"CALLAO {d.Date:dd/MM/yyyy}", 9, true);
-        p.Text(right, 763, "Señores:", 9, true);
-        p.Text(right, 750, Clip(d.Client, 49), 8);
+        // Encabezado comercial fijo. Mantener la columna izquierda dentro de x=47..360
+        // y la fecha/destinatario en x=390..562 para evitar superposiciones.
+        const double headerRight = 390;
+        p.Text(left, 782, "R&B Freight Cargo S.A.C. - ImportOps", 11, true);
+        p.Text(left, 765, Clip(d.Address, 50), 8);
+        p.Text(left, 752, Clip(d.Phone is null ? d.Email : $"TELEF. {d.Phone}", 50), 8);
+        p.Text(headerRight, 782, $"CALLAO {d.Date:dd/MM/yyyy}", 9, true);
+        p.Text(headerRight, 765, "Señores:", 9, true);
+        p.Text(headerRight, 751, Clip(d.Client, 30), 8);
         p.Text(left, 717, $"PROFORMA N° {d.Number}", 15, true);
         p.Text(left, 700, $"FILE {Clip(d.Reference, 25)}", 9, true);
         p.Text(right, 700, "Contenido:", 8);
@@ -92,105 +94,3 @@ internal static class CommercialProformaPdf
             p.Right(far, y, Money(t.Amount), 8);
             y -= 13;
         }
-        p.Text(right, y - 2, "TOTAL DERECHOS + PERCEPCION US$", 8, true);
-        p.Rule(far - 81, y + 9, far, 1);
-        p.Right(far, y - 14, Money(d.Duties), 8, true);
-        y -= 40;
-        p.Rule(right, y, far, 2);
-        y -= 22;
-        var lastGroup = "";
-        foreach (var e in d.Expenses)
-        {
-            var group = string.IsNullOrWhiteSpace(e.Group) ? "GASTOS Y SERVICIOS" : e.Group.ToUpperInvariant();
-            if (!string.Equals(lastGroup, group, StringComparison.OrdinalIgnoreCase))
-            {
-                if (lastGroup.Length > 0) y -= 10;
-                if (y < 100) { p = new Page(); pages.Add(p); y = 780; }
-                p.Text(right, y, Clip(group, 43), 9, true);
-                p.Rule(right, y - 3, right + 140);
-                y -= 16;
-                lastGroup = group;
-            }
-            if (y < 90) { p = new Page(); pages.Add(p); y = 780; }
-            p.Text(right, y, Clip(e.Name.ToUpperInvariant(), 40) + (e.NonTaxable ? " **" : ""), 8);
-            p.Right(far, y, Money(e.Amount), 8);
-            y -= 13;
-        }
-        if (y < 125) { p = new Page(); pages.Add(p); y = 780; }
-        p.Rule(far - 82, y + 8, far, 1);
-        p.Text(right, y - 4, "TOTAL GASTOS US$", 9, true); p.Right(far, y - 4, Money(d.ExpensesTotal), 9, true);
-        y -= 28;
-        p.Text(right, y, "I.G.V. 18 %", 9, true); p.Right(far, y, Money(d.ExpenseTax), 9);
-        y -= 28;
-        p.Text(right, y, "TOTAL PROFORMA US$", 10, true); p.Right(far, y, Money(d.Total), 11, true);
-        // Información complementaria, en la columna izquierda, sin alterar el bloque económico.
-        p = pages[0];
-        var ly = top - 116;
-        p.Text(left, ly, "DATOS BANCARIOS PARA TRANSFERENCIAS", 8, true); ly -= 17;
-        if (d.Banks.Count > 0)
-        {
-            foreach (var bank in d.Banks)
-            {
-                if (ly < 205) break;
-                p.Text(left, ly, Clip(bank.Holder ?? d.Company, 46), 8, true); ly -= 12;
-                p.Text(left, ly, $"BANCO: {Clip(bank.Bank, 37)}", 8); ly -= 12;
-                p.Text(left, ly, $"CUENTA {bank.Currency}: {bank.Number}", 8); ly -= 12;
-                p.Text(left, ly, "CCI: 00000", 8); ly -= 19;
-            }
-        }
-        else
-        {
-            p.Text(left, ly, "BANCO: 00000", 8); ly -= 13;
-            p.Text(left, ly, "CUENTA PEN: 00000", 8); ly -= 13;
-            p.Text(left, ly, "CUENTA USD: 00000", 8); ly -= 13;
-            p.Text(left, ly, "CCI: 00000", 8); ly -= 15;
-        }
-        if (!string.IsNullOrWhiteSpace(d.BankInstructions))
-            foreach (var segment in d.BankInstructions.Split('\n').Take(3))
-            { p.Text(left, ly, Clip(segment, 49), 7); ly -= 12; }
-        var notesY = Math.Min(190, ly - 20);
-        p.Text(left, notesY, "Proforma", 9);
-        p.Text(left, notesY - 20, $"Fecha:  {d.Date:dd/MM/yyyy}", 9);
-        p.Rule(left, notesY - 34, left + 180);
-        p.Text(left, notesY - 48, "Proforma hecha por:", 8);
-        p.Text(left, notesY - 72, "NOTA:", 8, true);
-        p.Text(left, notesY - 87, d.ExpenseTax > 0 ? "IGV SOBRE SERVICIOS SEGUN DETALLE" : "SERVICIOS SIN IGV APLICADO", 9, true);
-        if (!string.IsNullOrWhiteSpace(d.Notes)) p.Text(left, notesY - 112, Clip(d.Notes, 51), 7);
-        if (!string.IsNullOrWhiteSpace(d.Terms)) p.Text(left, notesY - 125, Clip(d.Terms, 51), 7);
-        return Encode(pages);
-    }
-
-    private static byte[] Encode(IReadOnlyList<Page> pages)
-    {
-        var objects = new List<byte[]>();
-        void Add(string s) => objects.Add(Encoding.Latin1.GetBytes(s));
-        Add("<< /Type /Catalog /Pages 2 0 R >>");
-        Add($"<< /Type /Pages /Kids [{string.Join(" ", Enumerable.Range(0, pages.Count).Select(i => $"{5 + 2 * i} 0 R"))}] /Count {pages.Count} >>");
-        Add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
-        Add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
-        foreach (var page in pages)
-        {
-            var contentId = objects.Count + 2;
-            Add($"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents {contentId} 0 R >>");
-            var bytes = Encoding.Latin1.GetBytes(page.Commands.ToString());
-            objects.Add(Combine(Encoding.ASCII.GetBytes($"<< /Length {bytes.Length} >>\nstream\n"), bytes, Encoding.ASCII.GetBytes("\nendstream")));
-        }
-        using var ms = new MemoryStream();
-        void Write(string s) => ms.Write(Encoding.Latin1.GetBytes(s));
-        Write("%PDF-1.4\n%âãÏÓ\n");
-        var offsets = new List<long> { 0 };
-        for (var i = 0; i < objects.Count; i++)
-        {
-            offsets.Add(ms.Position); Write($"{i + 1} 0 obj\n"); ms.Write(objects[i]); Write("\nendobj\n");
-        }
-        var xref = ms.Position;
-        Write($"xref\n0 {objects.Count + 1}\n0000000000 65535 f \n");
-        foreach (var off in offsets.Skip(1)) Write($"{off:0000000000} 00000 n \n");
-        Write($"trailer\n<< /Size {objects.Count + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF");
-        return ms.ToArray();
-    }
-    private static byte[] Combine(params byte[][] chunks)
-    {
-        using var ms = new MemoryStream(); foreach (var chunk in chunks) ms.Write(chunk); return ms.ToArray();
-    }
-}
