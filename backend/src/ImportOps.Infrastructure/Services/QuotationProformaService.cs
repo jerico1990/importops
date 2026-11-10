@@ -96,7 +96,7 @@ public sealed class QuotationProformaService(ImportOpsDbContext db, ICurrentComp
         line.Amount=R(r.Amount); line.CurrencyCode=cur; line.Notes=Clean(r.Notes); line.IsCalculated=false; line.RateApplied=null; line.CalculationBase=null;
         Touch(q); await db.SaveChangesAsync(ct); await Recalc(id,ct); return await GetAsync(id,ct);
     }
-    public async Task<bool> DeleteTaxAsync(long id,long tid,CancellationToken ct){var q=await Owned(id,true,ct);if(q is null)return false;Draft(q);var e=await db.QuotationCustomsTaxes.SingleOrDefaultAsync(x=>x.QuotationId==id&&x.QuotationCustomsTaxId==tid,ct);if(e is null)return false;db.Remove(e);Touch(q);await db.SaveChangesAsync(ct);await Recalc(id,ct);return true;}
+    public async Task<bool> DeleteTaxAsync(long id,long tid,CancellationToken ct){var q=await Owned(id,true,ct);if(q is null)return false;Draft(q);var e=await db.QuotationCustomsTaxes.SingleOrDefaultAsync(x=>x.QuotationId==id&&x.QuotationCustomsTaxId==tid,ct);if(e is null)return false;if(e.IsCalculated || new[]{"ADVALOREM","IGV","IPM","PERCEPCION"}.Contains(e.TaxCode,StringComparer.OrdinalIgnoreCase))throw new InvalidOperationException("Los tributos automáticos y Ad Valorem no se eliminan desde esta opción.");db.Remove(e);Touch(q);await db.SaveChangesAsync(ct);await Recalc(id,ct);return true;}
 
     private async Task Recalc(long id,CancellationToken ct)
     {
