@@ -1,4 +1,4 @@
-import { api } from "@/lib/api/http";
+import { api, downloadDocumentFile } from "@/lib/api/http";
 import type { PagedResult } from "@/types/common";
 import type {
   DocumentObservation,
@@ -118,19 +118,9 @@ export const documentsApi = {
     }),
 
   download: async (documentId: number, fileName: string) => {
-    const response = await fetch(`/api/documents/${documentId}/download`, {
-      method: "GET",
-      credentials: "include"
-    });
-    if (!response.ok) throw new Error("No se pudo descargar el documento.");
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = fileName;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
+    await downloadDocumentFile(
+      `/api/documents/${documentId}/download`,
+      fileName
+    );
   }
 };

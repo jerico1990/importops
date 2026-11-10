@@ -134,3 +134,68 @@ export async function downloadFile(path: string): Promise<{ blob: Blob; fileName
   const fileName = decodeURIComponent(utf?.[1] ?? plain?.[1] ?? "cotizacion.pdf");
   return { blob: await response.blob(), fileName };
 }
+
+
+/**
+ * Descarga documentos desde la API de ImportOps,
+ * conservando la sesión del usuario.
+ */
+export async function downloadDocumentFile(
+  path: string,
+  fileName: string
+): Promise<void> {
+  const response = await fetch(buildUrl(path), {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Accept: "application/octet-stream, application/pdf, */*"
+    }
+  });
+
+  if (!response.ok) {
+    const body = await parseBody(response);
+
+    const payload =
+      body && typeof body === "object"
+        ? (body as ApiErrorPayload)
+        : undefined;
+
+    throw new HttpError(
+      response.status,
+      payload?.detail ??
+        payload?.message ??
+        payload?.title ??
+        `Error al descargar documento (HTTP ${response.status})`,
+      payload
+    );
+  }
+
+  const type = (
+    response.headers.get("content-type") ?? ""
+  ).toLowerCase();
+
+  if (
+    type.includes("text/html") ||
+    type.includes("application/json")
+  ) {
+    throw new Error(
+      `La descarga devolvió ${type} en lugar del archivo solicitado. Verifica VITE_API_BASE_URL.`
+    );
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+
+  try {
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = fileName;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  } finally {
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  }
+}
