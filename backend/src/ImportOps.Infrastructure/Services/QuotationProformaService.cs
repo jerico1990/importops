@@ -32,7 +32,6 @@ public sealed class QuotationProformaService(ImportOpsDbContext db, ICurrentComp
             co.AddressLine,
             co.Phone,
             co.Email,
-            co.LegalName, co.AddressLine, co.Phone, co.Email,
             q.Client.LegalName, q.QuotationNo, q.IssueDate, p.ReferenceFile,
             p.ContentDescription, p.CustomsRegimeName, p.CustomsOfficeName,
             p.EstimatedArrivalDate, p.ExchangeRate, p.ExwAmount, p.FreightAmount,
