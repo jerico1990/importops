@@ -47,7 +47,7 @@ import { OperationFinancePanel } from "@/features/finance/OperationFinancePanel"
 import { HttpError } from "@/lib/api/http";
 import { formatDate, formatMoney } from "@/lib/format";
 
-type TabKey = "SUMMARY" | "WORKFLOW" | "TASKS" | "SHIPMENTS" | "DOCUMENTS" | "CUSTOMS" | "FINANCE" | "TIMELINE" | "NOTES";
+type TabKey = "SUMMARY" | "TASKS" | "SHIPMENTS" | "DOCUMENTS" | "CUSTOMS" | "FINANCE" | "TIMELINE" | "NOTES";
 type ActionKey = "HOLD" | "RESUME" | "CANCEL" | "CLOSE" | null;
 
 function tone(code: string) {
@@ -159,7 +159,7 @@ export function OperationDetailPage() {
 
   useEffect(() => {
     if (!operation) return;
-    if (tab === "WORKFLOW") void loadWorkflow();
+    if (tab === "TIMELINE") void loadWorkflow();
     if (tab === "TASKS") void loadTasks();
     if (tab === "TIMELINE") void loadEvents();
     if (tab === "NOTES") void loadNotes();
@@ -313,7 +313,7 @@ export function OperationDetailPage() {
         onChange={(value) => setTab(value as TabKey)}
         items={[
           { value: "SUMMARY", label: "Resumen" },
-          { value: "WORKFLOW", label: "Workflow" },
+          
           ...(!clientMode ? [{ value: "TASKS", label: "Tareas" }] : []),
           { value: "SHIPMENTS", label: "Embarques" },
           { value: "DOCUMENTS", label: "Documentos" },
@@ -398,7 +398,7 @@ export function OperationDetailPage() {
           </div>
         )}
 
-        {tab === "WORKFLOW" && (
+        {tab === "TIMELINE" && (
           <div className="grid gap-4 xl:grid-cols-2">
             <Card className="p-5">
               <div className="flex items-center justify-between">
@@ -627,7 +627,7 @@ export function OperationDetailPage() {
         onChanged={async () => {
           setStageOpen(false);
           await refresh();
-          if (tab === "WORKFLOW") await loadWorkflow();
+          if (tab === "TIMELINE") await loadWorkflow();
           if (tab === "TASKS") await loadTasks();
         }}
       />

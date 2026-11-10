@@ -9,16 +9,36 @@ export const formatDate = (value?: string | null) => {
   }).format(date);
 };
 
-export const formatMoney = (
-  value: number,
-  currency = "USD"
-) =>
-  new Intl.NumberFormat("es-PE", {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value);
+
+export const formatMoney = (value: number, currency = "USD") => {
+  const raw = (currency || "USD").trim().toUpperCase();
+
+  const normalized = ({
+    PE: "PEN",
+    S: "PEN",
+    SOL: "PEN",
+    SOLES: "PEN",
+    US: "USD",
+    DOLAR: "USD"
+  } as Record<string, string>)[raw] ?? raw;
+
+  try {
+    return new Intl.NumberFormat("es-PE", {
+      style: "currency",
+      currency: normalized,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  } catch (error) {
+    if (!(error instanceof RangeError)) throw error;
+
+    return `${normalized || "?"} ${new Intl.NumberFormat("es-PE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value)}`;
+  }
+};
+
 
 
 export const formatAmount = (value: number) =>

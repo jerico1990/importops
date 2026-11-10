@@ -40,7 +40,7 @@ export const navigation: NavGroup[] = [
     { label: "Importaciones", path: "/operaciones", icon: PackageSearch, permissions: [Permissions.OperationsView] },
     { label: "Embarques", path: "/embarques", icon: Ship, permissions: [Permissions.ShipmentsView] },
     { label: "Aduanas", path: "/aduanas", icon: Landmark, permissions: [Permissions.CustomsView] },
-    { label: "Documentos", path: "/documentos", icon: FileText, permissions: [Permissions.DocumentsView] },
+    /*{ label: "Documentos", path: "/documentos", icon: FileText, permissions: [Permissions.DocumentsView] },*/
     { label: "Finanzas", path: "/finanzas", icon: ReceiptText, permissions: [Permissions.FinanceView] }
   ]},
   { label: "Administración", items: [
