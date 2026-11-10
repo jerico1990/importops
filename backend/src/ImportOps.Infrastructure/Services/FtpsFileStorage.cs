@@ -33,8 +33,10 @@ public sealed class FtpsFileStorage(IConfiguration configuration) : IFileStorage
         (configuration["Storage:Ftps:RemoteRoot"] ?? "/importops").Trim('/');
 
     private readonly bool _allowCertificateNameMismatch =
-        configuration.GetValue<bool>(
-            "Storage:Ftps:AllowCertificateNameMismatch");
+    bool.TryParse(
+        configuration["Storage:Ftps:AllowCertificateNameMismatch"],
+        out var allow
+    ) && allow;
 
     private AsyncFtpClient CreateClient()
     {
@@ -127,7 +129,7 @@ public sealed class FtpsFileStorage(IConfiguration configuration) : IFileStorage
                 FtpRemoteExists.Overwrite,
                 true,
                 FtpVerify.Retry,
-                cancellationToken: ct);
+                token: ct);
 
             if (status != FtpStatus.Success)
             {
