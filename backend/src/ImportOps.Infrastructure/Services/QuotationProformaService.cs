@@ -121,12 +121,13 @@ public sealed class QuotationProformaService(ImportOpsDbContext db, ICurrentComp
         var lines=await db.QuotationCustomsTaxes.Where(x=>x.QuotationId==q.QuotationId).ToListAsync(ct);
         var adValorem=byCode.TryGetValue("ADVALOREM",out var adConcept)?lines.FirstOrDefault(x=>x.CustomsTaxConceptId==adConcept.CustomsTaxConceptId)?.Amount??0m:0m;
         var customsValue=q.CustomsValue??QuotationProformaCalculator.CustomsValue(q.ExwAmount??0,q.FreightAmount??0,q.InsuranceAmount??0);
-        var igv=QuotationProformaCalculator.CustomsValueTax(customsValue,igvConcept.DefaultRate.Value);
-        var ipm=QuotationProformaCalculator.CustomsValueTax(customsValue,ipmConcept.DefaultRate.Value);
+        var importTaxBase=QuotationProformaCalculator.ImportTaxBase(customsValue,adValorem);
+        var igv=QuotationProformaCalculator.CustomsValueTax(importTaxBase,igvConcept.DefaultRate.Value);
+        var ipm=QuotationProformaCalculator.CustomsValueTax(importTaxBase,ipmConcept.DefaultRate.Value);
         var perceptionBase=QuotationProformaCalculator.PerceptionBase(customsValue,adValorem,igv,ipm);
         var perception=QuotationProformaCalculator.Perception(customsValue,adValorem,igv,ipm,perceptionConcept.DefaultRate.Value);
-        UpsertCalculated(lines,q.QuotationId,igvConcept,customsValue,igv);
-        UpsertCalculated(lines,q.QuotationId,ipmConcept,customsValue,ipm);
+        UpsertCalculated(lines,q.QuotationId,igvConcept,importTaxBase,igv);
+        UpsertCalculated(lines,q.QuotationId,ipmConcept,importTaxBase,ipm);
         UpsertCalculated(lines,q.QuotationId,perceptionConcept,perceptionBase,perception);
         await db.SaveChangesAsync(ct);
     }
