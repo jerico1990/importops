@@ -112,7 +112,7 @@ public sealed class SecurityService(
                 x.IsActive);
 
         if (currentUser.IsClientUser)
-            q = q.Where(x => x.Code == "CLIENT_ADMIN" || x.Code == "CLIENT_USER");
+            q = q.Where(x => x.Code == "CLIENT_ADMIN" || x.Code == "CLIENT_ADMI" || x.Code == "CLIENT_USER");
 
         return await q
             .OrderBy(x => x.Name)
@@ -364,6 +364,7 @@ public sealed class SecurityService(
         var clientRoles = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "CLIENT_ADMIN",
+            "CLIENT_ADMI",
             "CLIENT_USER"
         };
 

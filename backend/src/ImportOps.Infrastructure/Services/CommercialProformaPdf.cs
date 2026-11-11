@@ -72,7 +72,7 @@ internal static class CommercialProformaPdf
         Pair(644, "Valor Aduanas US$:", Three(d.CustomsValue), "Tipo de Cambio:", d.ExchangeRate?.ToString("N3", CultureInfo.GetCultureInfo("en-US")));
         p.Text(right, 631, "Peso NETO:", 8); p.Right(far, 631, d.Weight.HasValue ? Three(d.Weight.Value) : "", 8);
         p.Rule(left, 612, far);
-        p.Text(left, 599, $"EXW US$:  {Three(d.Exw)}", 8, true);
+        p.Text(left, 599, $"FOB US$:  {Three(d.Exw)}", 8, true);
         p.Text(230, 599, $"FLETE US$:  {Money(d.Freight)}", 8);
         p.Text(397, 599, $"SEGURO US$:  {Three(d.Insurance)}", 8);
         p.Rule(left, 589, far);

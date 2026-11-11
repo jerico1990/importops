@@ -10,7 +10,7 @@ import { securityApi } from "./security.api";
 import type { ClientContact } from "@/features/clients/types";
 import type { SecurityRole, SecurityUser } from "./types";
 
-const clientRoleCodes = new Set(["CLIENT_ADMIN", "CLIENT_USER"]);
+const clientRoleCodes = new Set(["CLIENT_ADMIN", "CLIENT_ADMI", "CLIENT_USER"]);
 
 export function UserFormDialog({
   open,
